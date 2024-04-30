@@ -1,4 +1,4 @@
-DROP PROCEDURE IF EXISTS Borrow, Return_book, Books_Late_Fee, Members_Late_Fee;
+DROP PROCEDURE IF EXISTS Borrow, Return_book, Books_Late_Fee, Members_Late_Fee, books_borrowed_by;
 
 
 -- a procedure to insert a record into Borrowed_Books When a book is borrowed
@@ -58,5 +58,19 @@ BEGIN
 	JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
 	JOIN Members ON Members.Member_id=Borrowed_Books.Member_id
 	WHERE Members.Member_id=$1;
+END;
+$$;
+
+
+-- Get a list of books borrowed by a specific member (e.g., John Doe).
+CREATE PROCEDURE books_borrowed_by(VARCHAR)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	SELECT Name, Title, Author
+	FROM Members 
+	JOIN Borrowed_Books ON Borrowed_Books.Member_Id=Members.Member_id
+	JOIN Books ON Books.Book_id=Borrowed_Books.Book_Id
+	WHERE Name=$1;
 END;
 $$;
