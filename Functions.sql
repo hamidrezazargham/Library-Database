@@ -29,7 +29,7 @@ AS $$
 DECLARE
 	numbers INT;
 BEGIN
-	SELECT Books.Available_Copies INTO numbers;
+	SELECT Books.Available_Copies FROM Books INTO numbers;
 	RETURN numbers;
 END;
 $$;
