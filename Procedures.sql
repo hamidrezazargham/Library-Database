@@ -36,7 +36,7 @@ CREATE PROCEDURE Books_Late_Fee()
 LANGUAGE plpgsql 
 AS $$
 BEGIN
-	SELECT Title, Name, DATEDIFF(DAY, Borrow_Date, Return_Date)-14 AS Overdue_Days,
+	SELECT Title, Name, (Return_Date - Borrow_Date)-14 AS Overdue_Days,
 	get_late_fee(Borrow_Date, Return_Date) AS Late_Fee
 	FROM Books
 	JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
@@ -52,7 +52,7 @@ CREATE PROCEDURE Members_Late_Fee(INT)
 LANGUAGE plpgsql 
 AS $$
 BEGIN
-	SELECT Name, Title, DATEDIFF(DAY, Borrow_Date, Return_Date)-14 AS Overdue_Days,
+	SELECT Name, Title, (Return_Date - Borrow_Date)-14 AS Overdue_Days,
 	get_late_fee(Borrow_Date, Return_Date) AS Late_Fee
 	FROM Books
 	JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
@@ -88,3 +88,5 @@ BEGIN
 	WHERE Title=$1;
 END;
 $$;
+
+
