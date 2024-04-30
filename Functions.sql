@@ -33,31 +33,3 @@ BEGIN
 	RETURN numbers;
 END;
 $$;
-
-
--- a function to decrease the available_copies value when a book is borrowed
-CREATE FUNCTION decrease()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-	UPDATE Books
-	SET Available_Copies=Available_Copies-1
-	WHERE Book_id=NEW.Book_Id;
-	RETURN NEW;
-END;
-$$;
-
-
--- a function to increase the available_copies value when a book is returned
-CREATE FUNCTION increase()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-	UPDATE Books
-	SET Available_Copies=Available_Copies+1
-	WHERE Book_id=NEW.Book_Id;
-	RETURN NEW;
-END;
-$$;
