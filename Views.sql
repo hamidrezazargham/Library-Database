@@ -1,4 +1,4 @@
-DROP VIEW IF EXISTS low_books, borrowers, top_genre, avg_dur, top_borrowers;
+DROP VIEW IF EXISTS low_books, borrowers, top_genre, avg_dur, top_borrowers, available_books;
 
 
 -- a view to get books with available copies lower than 5.
@@ -47,3 +47,11 @@ AVG(Return_Date - Borrow_Date) Average_Duration
 FROM Borrowed_Books
 JOIN Books ON Books.Book_id=Borrowed_Books.Book_Id
 GROUP BY Title;
+
+
+-- Find the books that are currently available for borrowing 
+-- (i.e., books with at least one available copy).
+-- Display the book titles and the number of available copies.
+CREATE VIEW available_books AS
+SELECT Title, Available_Copies FROM Books 
+WHERE Available_Copies>= 1;
