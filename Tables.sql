@@ -18,6 +18,8 @@ CREATE TABLE Members (
 	Member_id INT PRIMARY KEY,
 	Name VARCHAR(100) NOT NULL,
 	Email VARCHAR(100) UNIQUE,
+	Phone_Number VARCHAR,
+	Address TEXT,
 	Join_Date DATE
 );
 

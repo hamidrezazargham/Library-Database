@@ -11,7 +11,7 @@ FROM Books WHERE Available_Copies<5;
 -- a view to get borrowed book and the borrowers.
 -- Display the borrowed book title, borrower's name, email, borrow date and return date.
 CREATE VIEW borrowers AS
-SELECT Title, Name, Email, Borrow_Date, Return_Date
+SELECT Title, Name, Email, Phone_Number, Borrow_Date, Return_Date
 FROM Books
 JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
 JOIN Members ON Members.Member_id=Borrowed_Books.Member_id;
@@ -60,7 +60,7 @@ WHERE Available_Copies>= 1;
 -- Categorize members by their behavior
 -- Display their names and emails.
 CREATE VIEW categorize AS 
-SELECT Name, Email, COUNT(Borrowed_Books.Member_id) AS NO_of_Books_Borrowed,
+SELECT Name, Email, Phone_Number, COUNT(Borrowed_Books.Member_id) AS NO_of_Books_Borrowed,
 CASE
 WHEN COUNT(Borrowed_Books.Member_id)<5
 THEN 'OCCASIONAL BORROWERS'
@@ -74,4 +74,4 @@ THEN 'FREQUENT BORROWER'
 END AS Borrowed_Behavior
 FROM Borrowed_Books
 JOIN Members ON Members.Member_id=Borrowed_Books.Member_Id
-GROUP BY Name, Email;
+GROUP BY Name, Email, Phone_Number;
