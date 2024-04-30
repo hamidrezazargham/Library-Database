@@ -1,4 +1,4 @@
-DROP VIEW IF EXISTS low_books, borrowers, top_genre;
+DROP VIEW IF EXISTS low_books, borrowers, top_genre, avg_dur;
 
 
 -- a view to get books with available copies lower than 5.
@@ -26,3 +26,13 @@ JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
 GROUP BY Genre, Title
 ORDER BY total_borrow DESC
 LIMIT 1;
+
+
+-- Calculate the average duration a book is borrowed by members.
+-- Display the book title, the average duration in days, and the number of times it has been borrowed.
+CREATE VIEW avg_dur AS
+SELECT title, COUNT(*) AS noOftimesborrowed,
+AVG(Return_Date - Borrow_Date) Average_Duration
+FROM Borrowed_Books
+JOIN Books ON Books.Book_id=Borrowed_Books.Book_Id
+GROUP BY Title;
