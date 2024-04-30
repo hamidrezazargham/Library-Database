@@ -36,7 +36,7 @@ CREATE PROCEDURE Books_Late_Fee()
 LANGUAGE plpgsql 
 AS $$
 BEGIN
-	SELECT Title, Name, Email, Phone_Number, (Return_Date - Borrow_Date)-14 AS Overdue_Days,
+	SELECT Title, First_Name || ' ' || Last_Name AS Member, Email, Phone_Number, (Return_Date - Borrow_Date)-14 AS Overdue_Days,
 	get_late_fee(Borrow_Date, Return_Date) AS Late_Fee
 	FROM Books
 	JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
@@ -52,7 +52,7 @@ CREATE PROCEDURE Members_Late_Fee(INT)
 LANGUAGE plpgsql 
 AS $$
 BEGIN
-	SELECT Name, Email, Phone_Number, Title, (Return_Date - Borrow_Date)-14 AS Overdue_Days,
+	SELECT First_Name || ' ' || Last_Name AS Member, Email, Phone_Number, Title, (Return_Date - Borrow_Date)-14 AS Overdue_Days,
 	get_late_fee(Borrow_Date, Return_Date) AS Late_Fee
 	FROM Books
 	JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
@@ -67,11 +67,11 @@ CREATE PROCEDURE books_borrowed_by(VARCHAR)
 LANGUAGE plpgsql
 AS $$
 BEGIN
-	SELECT Name, Email, Phone_Number, Title, Author
+	SELECT First_Name || ' ' || Last_Name AS Member, Email, Phone_Number, Title, Author
 	FROM Members 
 	JOIN Borrowed_Books ON Borrowed_Books.Member_Id=Members.Member_id
 	JOIN Books ON Books.Book_id=Borrowed_Books.Book_Id
-	WHERE Name=$1;
+	WHERE First_Name || ' ' || Last_Name=$1;
 END;
 $$;
 
@@ -81,7 +81,7 @@ CREATE PROCEDURE members_borrowed(VARCHAR)
 LANGUAGE plpgsql
 AS $$
 BEGIN
-	SELECT Title, Name, Email, Phone_Number, Borrow_Date, Return_Date
+	SELECT Title, First_Name || ' ' || Last_Name AS Member, Email, Phone_Number, Borrow_Date, Return_Date
 	FROM Borrowed_Books 
 	JOIN Books ON Books.Book_id=Borrowed_Books.Book_Id
 	JOIN Members ON members.Member_id=Borrowed_Books.Member_Id
