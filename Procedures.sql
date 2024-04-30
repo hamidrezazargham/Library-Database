@@ -1,0 +1,50 @@
+DROP PROCEDURE IF EXISTS Borrow, Books_Late_Fee, Members_Late_Fee;
+
+
+-- a procedure to insert a record into Borrowed_Books When a book is borrowed
+CREATE PROCEDURE Borrow(INT, INT, DATE)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	IF available_numbers(Book_id)>0 THEN
+	INSERT INTO Borrowed_Books(Book_Id, Member_Id, Borrow_Date)
+	VALUES ($1, $2, $3);
+	ELSE
+	SELECT 'Book is not Available';
+	END IF;
+END;
+$$;
+
+
+
+-- Calculate the late fees for each overdue book.
+-- Display the book title, the name of the member who borrowed it, the number of 
+-- days it is overdue, and the calculated late fee.
+CREATE PROCEDURE Books_Late_Fee()
+LANGUAGE plpgsql 
+AS $$
+BEGIN
+	SELECT Title, Name, DATEDIFF(DAY, Borrow_Date, Return_Date)-14 AS Overdue_Days,
+	get_late_fee(Borrow_Date, Return_Date) AS Late_Fee
+	FROM Books
+	JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
+	JOIN Members ON Members.Member_id=Borrowed_Books.Member_id;
+END;
+$$;
+
+
+-- Calculate the late fees for each members borrowed book.
+-- Display the member name, the title of the borrowed book, the number of 
+-- days it is overdue, and the calculated late fee.
+CREATE PROCEDURE Members_Late_Fee(INT)
+LANGUAGE plpgsql 
+AS $$
+BEGIN
+	SELECT Name, Title, DATEDIFF(DAY, Borrow_Date, Return_Date)-14 AS Overdue_Days,
+	get_late_fee(Borrow_Date, Return_Date) AS Late_Fee
+	FROM Books
+	JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
+	JOIN Members ON Members.Member_id=Borrowed_Books.Member_id
+	WHERE Members.Member_id=$1;
+END;
+$$;
