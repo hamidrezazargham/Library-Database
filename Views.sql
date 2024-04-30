@@ -1,4 +1,4 @@
-DROP VIEW IF EXISTS low_books, borrowers, top_genre, avg_dur;
+DROP VIEW IF EXISTS low_books, borrowers, top_genre, avg_dur, top_borrowers;
 
 
 -- a view to get books with available copies lower than 5.
@@ -26,6 +26,17 @@ JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
 GROUP BY Genre, Title
 ORDER BY total_borrow DESC
 LIMIT 1;
+
+
+-- Find the top 5 members who have borrowed the most books.
+-- Display their names and the number of books they have borrowed.
+CREATE VIEW top_borrowers AS
+SELECT Name, COUNT(Borrow_id) AS Total_Borrow 
+FROM Borrowed_Books
+JOIN Members ON Members.Member_id=Borrowed_Books.Member_Id
+GROUP BY Name
+ORDER BY Total_Borrow DESC
+LIMIT 5;
 
 
 -- Calculate the average duration a book is borrowed by members.
