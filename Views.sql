@@ -1,4 +1,4 @@
-DROP VIEW IF EXISTS low_books, borrowers, top_genre, avg_dur, top_borrowers, available_books;
+DROP VIEW IF EXISTS low_books, borrowers, top_genre, avg_dur, top_borrowers, available_books, categorize;
 
 
 -- a view to get books with available copies lower than 5.
@@ -55,3 +55,23 @@ GROUP BY Title;
 CREATE VIEW available_books AS
 SELECT Title, Available_Copies FROM Books 
 WHERE Available_Copies>= 1;
+
+
+-- Categorize members by their behavior
+-- Display their names and emails.
+CREATE VIEW categorize AS 
+SELECT Name, Email, COUNT(Borrowed_Books.Member_id) AS NO_of_Books_Borrowed,
+CASE
+WHEN COUNT(Borrowed_Books.Member_id)<5
+THEN 'OCCASIONAL BORROWERS'
+
+WHEN COUNT(Borrowed_Books.Member_id) BETWEEN 5 AND 10
+THEN 'REGULAR BORROWERS'
+
+WHEN COUNT(Borrowed_Books.Member_id)>10
+THEN 'FREQUENT BORROWER'
+
+END AS Borrowed_Behavior
+FROM Borrowed_Books
+JOIN Members ON Members.Member_id=Borrowed_Books.Member_Id
+GROUP BY Name, Email;
