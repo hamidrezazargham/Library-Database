@@ -1,4 +1,4 @@
-DROP PROCEDURE IF EXISTS Borrow, Books_Late_Fee, Members_Late_Fee;
+DROP PROCEDURE IF EXISTS Borrow, Return_book, Books_Late_Fee, Members_Late_Fee;
 
 
 -- a procedure to insert a record into Borrowed_Books When a book is borrowed
@@ -12,6 +12,18 @@ BEGIN
 	ELSE
 	SELECT 'Book is not Available';
 	END IF;
+END;
+$$;
+
+
+-- a procedure to update the return date of a record in Borrowed_Books table When a book is returned
+CREATE PROCEDURE Return_book(INT, INT, DATE)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	UPDATE Borrowed_Books
+	SET Return_Date=$3
+	WHERE Book_Id=$1 AND Member_Id=$2;
 END;
 $$;
 
