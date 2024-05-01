@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS Borrowed_Books;
-DROP TABLE IF EXISTS Books, Members, Author, Person;
+DROP TABLE IF EXISTS Books, Members, Authors, Employees, Persons;
 
 
 
@@ -53,10 +53,10 @@ CREATE TABLE Books (
 
 -- Borrowed books Table
 CREATE TABLE Borrowed_Books (
-	Borrow_id INT PRIMARY KEY,
-	Book_Id INT,
-	Member_Id INT,
-	Borrow_Date DATE,
+	Borrow_id SERIAL PRIMARY KEY,
+	Book_Id INT NOT NULL,
+	Member_Id INT NOT NULL,
+	Borrow_Date DATE NOT NULL,
 	Return_Date DATE,
 	FOREIGN KEY (Book_Id) REFERENCES Books(Book_Id),
 	FOREIGN KEY (Member_Id) REFERENCES Members(Member_Id)

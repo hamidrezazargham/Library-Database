@@ -1,4 +1,4 @@
-DROP PROCEDURE IF EXISTS Borrow, Return_book, Books_Late_Fee, Members_Late_Fee, books_borrowed_by, members_borrowed;
+DROP PROCEDURE IF EXISTS Borrow, Return_book;
 
 
 -- a procedure to insert a record into Borrowed_Books When a book is borrowed
@@ -6,7 +6,7 @@ CREATE PROCEDURE Borrow(INT, INT, DATE)
 LANGUAGE plpgsql
 AS $$
 BEGIN
-	IF available_numbers(Book_id)>0 THEN
+	IF available_numbers($1)>0 THEN
 	INSERT INTO Borrowed_Books(Book_Id, Member_Id, Borrow_Date)
 	VALUES ($1, $2, $3);
 	ELSE
@@ -24,67 +24,5 @@ BEGIN
 	UPDATE Borrowed_Books
 	SET Return_Date=$3
 	WHERE Book_Id=$1 AND Member_Id=$2;
-END;
-$$;
-
-
-
--- Calculate the late fees for each overdue book.
--- Display the book title, the name and contact information of the member who borrowed it, the number of 
--- days it is overdue, and the calculated late fee.
-CREATE PROCEDURE Books_Late_Fee()
-LANGUAGE plpgsql 
-AS $$
-BEGIN
-	SELECT Title, First_Name || ' ' || Last_Name AS Member, Email, Phone_Number, (Return_Date - Borrow_Date)-14 AS Overdue_Days,
-	get_late_fee(Borrow_Date, Return_Date) AS Late_Fee
-	FROM Books
-	JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
-	JOIN Members ON Members.Member_id=Borrowed_Books.Member_id;
-END;
-$$;
-
-
--- Calculate the late fees for each members borrowed book.
--- Display the member name, the title of the borrowed book, the number of 
--- days it is overdue, and the calculated late fee.
-CREATE PROCEDURE Members_Late_Fee(INT)
-LANGUAGE plpgsql 
-AS $$
-BEGIN
-	SELECT First_Name || ' ' || Last_Name AS Member, Email, Phone_Number, Title, (Return_Date - Borrow_Date)-14 AS Overdue_Days,
-	get_late_fee(Borrow_Date, Return_Date) AS Late_Fee
-	FROM Books
-	JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
-	JOIN Members ON Members.Member_id=Borrowed_Books.Member_id
-	WHERE Members.Member_id=$1;
-END;
-$$;
-
-
--- Get a list of books borrowed by a specific member (e.g., John Doe).
-CREATE PROCEDURE books_borrowed_by(VARCHAR)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-	SELECT First_Name || ' ' || Last_Name AS Member, Email, Phone_Number, Title, Author
-	FROM Members 
-	JOIN Borrowed_Books ON Borrowed_Books.Member_Id=Members.Member_id
-	JOIN Books ON Books.Book_id=Borrowed_Books.Book_Id
-	WHERE First_Name || ' ' || Last_Name=$1;
-END;
-$$;
-
-
--- Find members who borrowed a specific book (e.g., “The Great Gatsby”).
-CREATE PROCEDURE members_borrowed(VARCHAR)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-	SELECT Title, First_Name || ' ' || Last_Name AS Member, Email, Phone_Number, Borrow_Date, Return_Date
-	FROM Borrowed_Books 
-	JOIN Books ON Books.Book_id=Borrowed_Books.Book_Id
-	JOIN Members ON members.Member_id=Borrowed_Books.Member_Id
-	WHERE Title=$1;
 END;
 $$;
