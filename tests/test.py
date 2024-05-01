@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import random
 import data
 
-
+""" Put your database config in a python file caled data.py in the same directory as this file """
 conn = psg.connect(host=data.DB_HOST, dbname=data.DB_NAME, user=data.DB_USER, password=data.DB_PASSWORD, port=data.DB_PORT)
 cursor = conn.cursor()
 
