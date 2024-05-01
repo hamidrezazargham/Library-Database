@@ -84,8 +84,8 @@ BEGIN
 	RETURN QUERY
 	(
 		SELECT Members.First_Name || ' ' || Members.Last_Name AS Member, Members.Email, Members.Phone_Number, Books.Title, 
-		Borrowed_Books.Borrow_Date, Borrowed_Books.Return_Date, (Return_Date - Borrow_Date)-14 AS Overdue_Days,
-		get_late_fee(Borrow_Date, Return_Date) AS Late_Fee
+		Borrowed_Books.Borrow_Date, Borrowed_Books.Return_Date, (Borrowed_Books.Return_Date - Borrowed_Books.Borrow_Date)-14 AS Overdue_Days,
+		get_late_fee(Borrowed_Books.Borrow_Date, Borrowed_Books.Return_Date) AS Late_Fee
 		FROM Books
 		JOIN Borrowed_Books ON Borrowed_Books.Book_Id=Books.Book_id
 		JOIN Members ON Members.Member_id=Borrowed_Books.Member_id
