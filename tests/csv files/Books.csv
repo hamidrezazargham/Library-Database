@@ -1,0 +1,21 @@
+book_id,title,author_id,published_year,genre,available_copies
+1,1984,1,1949,Dystopian,10
+2,To Kill a Mockingbird,2,1960,Southern Gothic,15
+3,Harry Potter and the Philosopher's Stone,3,1997,Fantasy,20
+4,The Hobbit,4,1937,Fantasy,25
+5,The Great Gatsby,5,1925,Novel,10
+6,The Old Man and the Sea,6,1952,Novel,15
+7,Adventures of Huckleberry Finn,7,1884,Novel,20
+8,A Tale of Two Cities,8,1859,Historical Novel,25
+9,Pride and Prejudice,9,1813,Novel,30
+10,War and Peace,10,1869,Historical Novel,35
+11,Wuthering Heights,11,1847,Novel,40
+12,To the Lighthouse,12,1927,Novel,45
+13,The Picture of Dorian Gray,13,1890,Philosophical Novel,50
+14,And Then There Were None,14,1939,Mystery Novel,55
+15,The Hound of the Baskervilles,15,1902,Mystery Novel,60
+16,The Shining,16,1977,Horror Novel,65
+17,The Catcher in the Rye,17,1951,Novel,70
+18,Norwegian Wood,18,1987,Novel,75
+19,One Hundred Years of Solitude,19,1967,Magic Realism,80
+20,The Metamorphosis,20,1915,Novella,85

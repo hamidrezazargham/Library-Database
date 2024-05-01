@@ -1,0 +1,21 @@
+first_name,last_name,email,phone_number,member_id,address,join_date
+John,Doe,john.doe@example.com,1234567890,1,123 Main St,2024-01-01
+Jane,Doe,jane.doe@example.com,0987654321,2,456 Maple Ave,2024-01-02
+Jim,Smith,jim.smith@example.com,2345678901,3,789 Oak Dr,2024-01-03
+Jill,Johnson,jill.johnson@example.com,3456789012,4,321 Pine Ln,2024-01-04
+Jack,Jones,jack.jones@example.com,4567890123,5,654 Elm St,2024-01-05
+Jenny,Davis,jenny.davis@example.com,5678901234,6,987 Willow Rd,2024-01-06
+Joe,Miller,joe.miller@example.com,6789012345,7,147 Cedar Ct,2024-01-07
+Jess,Wilson,jess.wilson@example.com,7890123456,8,258 Spruce Pl,2024-01-08
+Jeff,Taylor,jeff.taylor@example.com,8901234567,9,369 Birch Pkwy,2024-01-09
+Julie,Anderson,julie.anderson@example.com,9012345678,10,480 Redwood Blvd,2024-01-10
+Jerry,Thomas,jerry.thomas@example.com,0123456789,11,591 Dogwood Ln,2024-01-11
+Janet,Jackson,janet.jackson@example.com,1234509876,12,602 Holly Dr,2024-01-12
+Jacob,White,jacob.white@example.com,2345609871,13,713 Magnolia Ave,2024-01-13
+Jasmine,Harris,jasmine.harris@example.com,3456709812,14,824 Jasmine Rd,2024-01-14
+James,Martin,james.martin@example.com,4567809123,15,935 Ivy Ct,2024-01-15
+Joan,Thompson,joan.thompson@example.com,5678091234,16,046 Rose Pl,2024-01-16
+Jean,Garcia,jean.garcia@example.com,6780912345,17,157 Tulip Pkwy,2024-01-17
+Jill,Martinez,jill.martinez@example.com,7809123456,18,268 Daisy Blvd,2024-01-18
+Judy,Robinson,judy.robinson@example.com,8091234567,19,379 Violet Ln,2024-01-19
+June,Clark,june.clark@example.com,0912345678,20,480 Sunflower Dr,2024-01-20

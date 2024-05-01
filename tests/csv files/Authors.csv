@@ -1,0 +1,21 @@
+first_name,last_name,email,phone_number,author_id
+George,Orwell,george.orwell@example.com,1234567890,1
+Harper,Lee,harper.lee@example.com,0987654321,2
+J.K.,Rowling,jk.rowling@example.com,2345678901,3
+J.R.R.,Tolkien,jrr.tolkien@example.com,3456789012,4
+F. Scott,Fitzgerald,f.scott.fitzgerald@example.com,4567890123,5
+Ernest,Hemingway,ernest.hemingway@example.com,5678901234,6
+Mark,Twain,mark.twain@example.com,6789012345,7
+Charles,Dickens,charles.dickens@example.com,7890123456,8
+Jane,Austen,jane.austen@example.com,8901234567,9
+Leo,Tolstoy,leo.tolstoy@example.com,9012345678,10
+Emily,Bronte,emily.bronte@example.com,0123456789,11
+Virginia,Woolf,virginia.woolf@example.com,1234509876,12
+Oscar,Wilde,oscar.wilde@example.com,2345609871,13
+Agatha,Christie,agatha.christie@example.com,3456709812,14
+Arthur,Conan Doyle,arthur.conan.doyle@example.com,4567809123,15
+Stephen,King,stephen.king@example.com,5678091234,16
+J.D.,Salinger,jd.salinger@example.com,6780912345,17
+Haruki,Murakami,haruki.murakami@example.com,7809123456,18
+Gabriel,Garcia Marquez,gabriel.garcia.marquez@example.com,8091234567,19
+Franz,Kafka,franz.kafka@example.com,0912345678,20

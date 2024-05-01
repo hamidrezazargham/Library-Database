@@ -1,0 +1,21 @@
+member,email,phone_number,no_of_books_borrowed,borrowed_behavior
+Jenny Davis,jenny.davis@example.com,5678901234,10,REGULAR BORROWERS
+Jeff Taylor,jeff.taylor@example.com,8901234567,11,FREQUENT BORROWER
+John Doe,john.doe@example.com,1234567890,6,REGULAR BORROWERS
+Jess Wilson,jess.wilson@example.com,7890123456,8,REGULAR BORROWERS
+June Clark,june.clark@example.com,0912345678,8,REGULAR BORROWERS
+Julie Anderson,julie.anderson@example.com,9012345678,6,REGULAR BORROWERS
+Jill Martinez,jill.martinez@example.com,7809123456,8,REGULAR BORROWERS
+Jean Garcia,jean.garcia@example.com,6780912345,8,REGULAR BORROWERS
+Joan Thompson,joan.thompson@example.com,5678091234,5,REGULAR BORROWERS
+Jill Johnson,jill.johnson@example.com,3456789012,9,REGULAR BORROWERS
+Jerry Thomas,jerry.thomas@example.com,0123456789,6,REGULAR BORROWERS
+Jane Doe,jane.doe@example.com,0987654321,7,REGULAR BORROWERS
+Joe Miller,joe.miller@example.com,6789012345,8,REGULAR BORROWERS
+James Martin,james.martin@example.com,4567809123,5,REGULAR BORROWERS
+Jacob White,jacob.white@example.com,2345609871,5,REGULAR BORROWERS
+Janet Jackson,janet.jackson@example.com,1234509876,5,REGULAR BORROWERS
+Jack Jones,jack.jones@example.com,4567890123,10,REGULAR BORROWERS
+Jasmine Harris,jasmine.harris@example.com,3456709812,11,FREQUENT BORROWER
+Jim Smith,jim.smith@example.com,2345678901,5,REGULAR BORROWERS
+Judy Robinson,judy.robinson@example.com,8091234567,9,REGULAR BORROWERS
