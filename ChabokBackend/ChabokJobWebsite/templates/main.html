@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/slick.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/slick-theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all.min-free.css' %}">
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <title>Main Page</title>
+</head>
+
+<body>
+    <header>
+        <div class="header-top">
+            <div class="row header-top ">
+                <div class="col-3">
+                    <div class="profile-pic-container ml-5">
+                        <img src="{% static 'images/andrew.jpg'%}" alt="Profile Pic" class="profile-pic">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="mid-header">
+                        Chabook
+                    </div>
+                </div>
+                <div class="col-5 ">
+                    <div class="dropdown mr-4 text-right">
+                        <button class="btn btn-secondary dropdown-toggle btn-menu mt" type="button"
+                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Menu
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <div class="text-center dropdown-text">Menu</div>
+                            <a class="dropdown-item" href="{% url 'profile' %}">edit profile</a>
+                            <a class="dropdown-item" href="{% url 'home' %}">home page</a>
+                            <a class="dropdown-item" href="{% url 'logout' %}">log out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <div class="container-fluid main-container">
+            <div class="row">
+                <div class="col-12 mt-3 div-search-box">
+                    <div class="input-group search-box">
+                        <input type="text" class="form-control search-box" placeholder="Search...">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slider mt-5">
+                {% for job_offer in context.recommendations %}
+                <div class="slider-item">
+                    <div class="row">
+                        <div class="col-6">
+                            <img class="job-image" src="{% static 'images/company.jpeg'%}" alt="Job Image">
+                        </div>
+                        <div class="col-6">
+                            <div class="job-info">
+                                <h3 class="job-title">{{job_offer.title}}</h3>   
+                                <p><i class="fas fa-briefcase"></i>{{job_offer.company_name}}.</p>
+                                <p><i class="far fa-clock"></i>{{job_ofer.type_collabration}}</p>
+                                <p><i class="fas fa-dollar-sign"></i>{{job_offer.salary}}</p>
+                                <p><i class="fas fa-map-marker-alt"></i>{{job_offer.location}}</p>
+                                <div class="btn-container">
+                                    <button class="btn btn-send-resume">Send Resume</button>
+                                    <button class="btn  btn-open-job">View Job</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            <div class="job-app-container">
+                <div class="row">
+                    <div class="col-12">
+                        <p class="job-app-text"><i class="fas fa-list mr-3"></i>My applications</p>
+                    </div>
+                </div>
+                <div class="job-app-shadow">
+                    <div class="row">
+                        <div class="col-7 job-app-status mt-5">    
+                            {% for application in context.applications %}
+                            <div class="job-status-item">
+                                <div class="row">
+                                    <div class="col-6 ">
+                                        <div class="job-status-company">        
+                                            {{application.job_offer.title}}
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="job-status-icon">
+                                            {% if application.status == "ACCEPTED" %}
+                                            <i class="fas fa-check-circle sucess"></i>
+                                            {% endif %}
+                                            {% if application.status == "REJECTED" %}
+                                            <i class="fas fa-times-circle rejected"></i>
+                                            {% endif %}
+                                            {% if application.status == "WAITING" %}
+                                            <i class="far fa-hourglass no-response"></i>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="container-fluid bottom-footer">
+            <div class="row">
+                <div class="col-4 footer-section footer-left">
+                    <h2>Chabook</h2>
+                    <p class="mt-3">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. 
+                        Perspiciatis culpa suscipit a tempora pariatur perferendis voluptates dolor vero, 
+                        ex ipsam sunt tempore reiciendis aperiam totam quae nesciunt illum deserunt! Vitae!
+                    </p>
+                </div>
+                <div class="col-2 footer-section">
+                    <h5 class="mb-4">Lorem ipsum dolor sit</h5>
+                    <p>Lorem ipsum dolor sit</p>
+                    <p>Lorem ipsum dolor sit</p>
+                    <p>Lorem ipsum dolor sit</p>
+                    <p>Lorem ipsum dolor sit</p>
+                </div>
+                <div class="col-2 footer-section">
+                    <h5 class="mb-4">Lorem ipsum dolor sit</h5>
+                    <p>Lorem ipsum dolor sit</p>
+                    <p>Lorem ipsum dolor sit</p>
+                    <p>Lorem ipsum dolor sit</p>
+                    <p>Lorem ipsum dolor sit</p>
+                </div>
+                <div class="col-3 footer-section">
+                    <h5 class="mb-4">Lorem ipsum dolor sit</h5>
+                    <p>Lorem ipsum dolor sit</p>
+                    <p>Lorem ipsum dolor sit</p>
+                    <p>Lorem ipsum dolor sit</p>
+                    <p>Lorem ipsum dolor sit</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/jquery-3.6.0.min.js'%}"></script>
+    <script src="{% static 'js/popper.min.js'%}"></script>
+    <script src="{% static 'js/bootstrap.min.js'%}"></script>
+    <script src="{% static 'js/slick.min.js'%}"></script>
+    <script src="{% static 'js/AntiOverflowFontResizer.min.js'%}"></script>
+    <script src="{% static 'main.js'%}"></script>
+
+
+    
+</body>
+
+</html>

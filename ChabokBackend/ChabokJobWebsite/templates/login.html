@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all.min-free.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <title>Login</title>
+</head>
+
+<body>
+    <div class="container-xl">
+        <div class="col align-self-center">
+            <div class="login-container">
+                <h2 class="text-center mb-4 login-page-text">sign in</h2>
+                <form id="loginForm" method="POST" action="">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            </div>
+                            <input type="username" class="form-control input-border" name="username" placeholder="Enter username">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            </div>
+                            <input type="password" class="form-control input-border" name="password" placeholder="Enter password">
+                        </div>
+                    </div>
+                    {% for message in messages %}
+                        <p id="messages">{{message}}</p>
+                    {% endfor %}
+                    <div>
+                        <div class="row">
+                            <div class="col-6"><a href="{% url 'signup' %}">Create an account</a></div>
+                            <div class="col-6"><button type="submit" class="btn btn-primary btn-block btn-submit">Sign In</button></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/jquery-3.6.0.min.js'%}"></script>
+    <script src="{% static 'js/popper.min.js'%}"></script>
+    <script src="{% static 'js/bootstrap.min.js'%}"></script>
+</body>
+
+</html>

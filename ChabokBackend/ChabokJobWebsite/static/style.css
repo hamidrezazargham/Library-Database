@@ -1,0 +1,55 @@
+:root {
+	--blue: #11009E; /* Define your primary color variable */
+	--purple: #4942E4; /* Define your border color variable */
+	--pink: #C4B0FF; /* Define your box shadow color variable */
+	--white: #FFFFFF;
+	--black : #2D2D2D;
+}
+body {
+	height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0;
+}
+.rtl{
+	direction: rtl;
+}
+.login-container {
+	width: 500px;
+	padding: 40px;
+	border: 1px solid var(--pink);
+	border-radius: 20px;
+    box-shadow: 20px 6px 12px 0px var(--pink);
+}
+.login-page-text {
+	font-size: 50px;
+    font-weight: bold;
+	color: var(--blue);
+}
+.btn-submit{
+	background-color: var(--blue);
+	border-radius: 20px;
+}
+.input-border {
+	border: 1px solid var(--pink);
+}
+.form-check-input.role-selector {
+	appearance: none;
+	width: 20px; 
+	height: 20px; 
+	border: 2px solid var(--pink); 
+	border-radius: 4px;
+}
+
+.form-check-input.role-selector:checked {
+    background-color: var(--pink);
+}
+.verification-input {
+	width: 60px;
+	height: 60px;
+	font-size: 24px;
+	text-align: center;
+	margin: 0 5px;
+}
+
