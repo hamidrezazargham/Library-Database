@@ -1,9 +1,3 @@
-import data
-from datetime import datetime
-import numpy as np
-
-
-
 def markdown_parse(text) -> str:
     text = str(text)
     chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']

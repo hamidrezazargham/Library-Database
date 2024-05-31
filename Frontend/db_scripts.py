@@ -1,5 +1,4 @@
 import requests
-import json
 from data import BASE_URL
 
 

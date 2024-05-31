@@ -1,12 +1,6 @@
-from telegram import Chat, Update, ChatMember, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
+from telegram import Update, ChatMember, InlineKeyboardMarkup
 from telegram.ext import (
-    Application,
-    CommandHandler,
-    ConversationHandler,
-    CallbackQueryHandler,
-    ContextTypes,
-    MessageHandler,
-    filters,
+    ContextTypes
 )
 
 

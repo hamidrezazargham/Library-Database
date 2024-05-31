@@ -1,6 +1,4 @@
 from funcs import *
-import utils
-import emojies
 
 
 CONVERSATION_EXPIRED = "This session has been expired"

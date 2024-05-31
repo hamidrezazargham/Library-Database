@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 
 from telegram.constants import ParseMode
-from telegram import Chat, Update, ChatMember, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -28,11 +28,6 @@ import db_scripts
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
-
-# logging.basicConfig(
-#     filename="botlog.log", encoding='utf-8',
-#     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-# )
 
 # set higher logging level for httpx to avoid all GET and POST requests being logged
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -147,34 +142,46 @@ async def employee(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await query.edit_message_text(response, parse_mode="MarkdownV2")
     return EMAIL
-    
-
-# async def set_first_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     user = update.effective_user
-#     username = user.username if user.username is not None else user.full_name
-    
-#     first_name = update.effective_message.text
-#     context.user_data['First_Name'] = first_name
-#     logger.info("%s entered %s as their first name", username, first_name)
-    
-#     response = Enter_last_name()
-#     await tf.send_message(update, response)
-    
-#     return LAST_NAME
 
 
-# async def set_last_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     user = update.effective_user
-#     username = user.username if user.username is not None else user.full_name
+async def edit_profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
     
-#     last_name = update.effective_message.text
-#     context.user_data['Last_Name'] = last_name
-#     logger.info("%s entered %s as their last name", username, last_name)
+    logger.info("%s wants to edit their profile", username)
     
-#     response = Enter_email()
-#     await tf.send_message(update, response)
+    response = Enter_first_name()
     
-#     return EMAIL
+    await tf.send_message(update, response)
+    return FIRST_NAME
+
+
+async def set_first_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    
+    first_name = update.effective_message.text
+    context.user_data['First_Name'] = first_name
+    logger.info("%s entered %s as their first name", username, first_name)
+    
+    response = Enter_last_name()
+    await tf.send_message(update, response)
+    
+    return LAST_NAME
+
+
+async def set_last_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    
+    last_name = update.effective_message.text
+    context.user_data['Last_Name'] = last_name
+    logger.info("%s entered %s as their last name", username, last_name)
+    
+    response = Enter_email()
+    await tf.send_message(update, response)
+    
+    return EMAIL
 
 
 async def set_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -255,76 +262,12 @@ async def lost_path(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """lost message"""
     user = update.effective_user
     username = user.username if user.username is not None else user.full_name
-    user_ids = db_scripts.get_user_ids()
-    
-    # if user.id not in user_ids:
-    #     logger.info("%s started a private chat with the bot", username)
-    #     return await start_private_chat(update, context)
 
     logger.info("%s is talking nonesense", username)
     response = lost(user.first_name)
 
     await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['making fun'])
     return None
-
-
-# async def add_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-#     user = update.effective_user
-#     username = user.username if user.username is not None else user.full_name
-#     # user_ids = db_scripts.get_user_ids()
-    
-#     # if user.id not in user_ids:
-#     #     logger.info("%s started a private chat with the bot", username)
-#     #     return await start_private_chat(update, context)
-
-#     com = update.effective_message.text.split()
-#     member = {
-#         "Member_id": int(com[1]),
-#         "First_Name": com[2],
-#         "Last_Name": com[3],
-#         "Email": com[4],
-#         "Phone_Number": com[5],
-#         "Address": com[6],
-#         "Join_Date": com[7]
-#     }
-#     logger.info("%s wants to add member: %s", username, member)
-#     res = db_scripts.add_member(member)
-#     if res.status_code == 200:
-#         response = "Done"
-#     else:
-#         response = "Somthing Went Wrong!"
-
-#     await tf.send_message(update, response)
-#     return None
-
-
-# async def add_employee(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-#     user = update.effective_user
-#     username = user.username if user.username is not None else user.full_name
-#     # user_ids = db_scripts.get_user_ids()
-    
-#     # if user.id not in user_ids:
-#     #     logger.info("%s started a private chat with the bot", username)
-#     #     return await start_private_chat(update, context)
-
-#     com = update.effective_message.text.split()
-#     employee = {
-#         "Employee_id": int(com[1]),
-#         "First_Name": com[2],
-#         "Last_Name": com[3],
-#         "Email": com[4],
-#         "Phone_Number": com[5],
-#         "Employee_Role": com[6]
-#     }
-#     logger.info("%s wants to add employee: %s", username, employee)
-#     res = db_scripts.add_employee(employee)
-#     if res.status_code == 200:
-#         response = "Done"
-#     else:
-#         response = "Somthing Went Wrong!"
-
-#     await tf.send_message(update, response)
-#     return None
 
 
 async def add_author(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -666,23 +609,59 @@ async def expired(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await query.edit_message_reply_markup(reply_markup=None)
     return None
 
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+
+    logger.info("%s wants help", username)
+    
+    response = help_center()
+    await tf.send_message(update, response)
+    
+    
+async def profile(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+
+    logger.info("%s wants to see their profile", username)
+    
+    if context.user_data['role'] == MEMBER:
+        response = Member_profile(
+            first_name=context.user_data['First_Name'],
+            last_name=context.user_data['Last_Name'],
+            email=context.user_data['Email'],
+            phone=context.user_data['Phone_Number'],
+            address=context.user_data['Address']
+        )
+    else:
+        response = Employee_profile(
+            first_name=context.user_data['First_Name'],
+            last_name=context.user_data['Last_Name'],
+            email=context.user_data['Email'],
+            phone=context.user_data['Phone_Number'],
+            role=context.user_data['Employee_Role']
+        )
+    await tf.send_message(update, response)
 
 def main() -> None:
-    application = Application.builder().token(data.BOT_API_KEY).build()
+    application = Application.builder().token(Data.BOT_API_KEY).build()
     
     start_conversation_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start_private_chat)],
+        entry_points=[
+            CommandHandler('start', start_private_chat),
+            CommandHandler('editprofile', edit_profile),
+        ],
         states={
             SET_ROLE: [
                 CallbackQueryHandler(member, pattern=f"^{MEMBER}$"),
                 CallbackQueryHandler(employee, pattern=f"^{EMPLOYEE}$")
             ],
-            # FIRST_NAME: [
-            #     MessageHandler(filters.ALL, set_first_name)
-            # ],
-            # LAST_NAME: [
-            #     MessageHandler(filters.ALL, set_last_name)
-            # ],
+            FIRST_NAME: [
+                MessageHandler(filters.ALL, set_first_name)
+            ],
+            LAST_NAME: [
+                MessageHandler(filters.ALL, set_last_name)
+            ],
             EMAIL: [
                 MessageHandler(filters.ALL, set_email)
             ],
@@ -694,7 +673,8 @@ def main() -> None:
             ]
         },
         fallbacks=[
-            CommandHandler('start', start_private_chat)
+            CommandHandler('start', start_private_chat),
+            CommandHandler('editprofile', edit_profile),
         ]
     )
     application.add_handler(start_conversation_handler)
@@ -752,12 +732,11 @@ def main() -> None:
     )
     application.add_handler(add_book_conversation_handler)
     
-    # application.add_handler(CommandHandler('addmember', add_member))
-    # application.add_handler(CommandHandler('addemployee', add_employee))
-    # application.add_handler(CommandHandler('addbook', add_book))
     application.add_handler(CommandHandler('borrow', borrow_book))
     application.add_handler(CommandHandler('return', return_book))
     application.add_handler(CommandHandler('delete', delete_book))
+    application.add_handler(CommandHandler('profile', profile))
+    application.add_handler(CommandHandler('help', help))
     
     # Interpret any other command or text message as a start of a private chat.
     # This will record the user as being in a private chat with bot.
@@ -772,20 +751,6 @@ def main() -> None:
     # We pass 'allowed_updates' handle *all* updates including `chat_member` updates
     # To reset this, simply pass `allowed_updates=[]`
     application.run_polling(allowed_updates=Update.ALL_TYPES, poll_interval=1)
-    
-    # start_conversation_handler = ConversationHandler(
-    #     entry_points=[CommandHandler('start', start_private_chat)],
-    #     states={
-    #         ACTIVE: [
-    #             CallbackQueryHandler(joined, pattern="^joined$"),
-    #             CallbackQueryHandler(show_commands, pattern="^commands$")
-    #         ]
-    #     },
-    #     fallbacks=[
-    #         CommandHandler('start', start_private_chat),
-    #     ]
-    # )
-    # application.add_handler(start_conversation_handler)
     
 
 if __name__ == "__main__":

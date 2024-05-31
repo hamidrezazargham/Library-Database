@@ -1,6 +1,4 @@
 from funcs import *
-import emojies
-import utils
 
 
 def lost(name: str) -> str:
@@ -110,4 +108,19 @@ def book_added() -> str:
     response = markdown_parse("Book added.")
     return response
 
-
+def help_center() -> str:
+    response = bold_text("View Profile - [e.g. /profile]\n")
+    response += markdown_parse("Send /profile to see your profile\n\n")
+    response += bold_text("Edit Profile - [e.g. /editprofile]\n")
+    response += markdown_parse("Send /editprofile to edit your profile\n\n")
+    response += bold_text("Add Book - [e.g. /addbook]\n")
+    response += markdown_parse("Send /addbook to add a book or increase the copies amount of a book in your library. then fill the required details of the book\n\n")
+    response += bold_text("Delete Book - [e.g. /delete 12 5 (book id, copies)]\n")
+    response += markdown_parse("Send /delete with id of the book and the amount of copies you want to delete\n\n")
+    response += bold_text("Borrow Book - [e.g. /borrow 1948 (book title)]\n")
+    response += markdown_parse("send /borrow with title of the book you want to borrow\n\n")
+    response += bold_text("Return Book - [e.g. /return 1948]\n")
+    response += markdown_parse("Send /return with title of the book you want to return\n\n")
+    response += bold_text("Add Author - [e.g. /addauthor]\n")
+    response += markdown_parse("Send /addauthor to add an author. then fill the required details of the author")
+    return response

@@ -1,9 +1,3 @@
-from django.shortcuts import render
-
-# Create your views here.
-
-import psycopg2
-import json
 from django.http import JsonResponse
 from django.db import connection
 
@@ -22,11 +16,24 @@ def add_member(request):
 
             # Insert member data into the "Members" table
             with connection.cursor() as cur:
-                query = f"""
-                    INSERT INTO Members (Member_id, Address, Join_Date, First_Name, Last_Name, Email, Phone_Number)
-                    VALUES ({member_id}, '{address}', '{join_date}', '{first_name}', '{last_name}', '{email}', '{phone_number}');
-                """
+                query = f"SELECT Member_id FROM Members WHERE Member_id = {member_id};"
                 cur.execute(query)
+                existing_member = cur.fetchone()
+                
+                if existing_member:
+                    query = f"""
+                        UPDATE Members
+                        SET Address='{address}', First_Name='{first_name}', Last_Name='{last_name}', Email='{email}', Phone_Number='{phone_number}'
+                        WHERE Member_id = {member_id};
+                    """
+                    cur.execute(query)
+                
+                else:
+                    query = f"""
+                        INSERT INTO Members (Member_id, Address, Join_Date, First_Name, Last_Name, Email, Phone_Number)
+                        VALUES ({member_id}, '{address}', '{join_date}', '{first_name}', '{last_name}', '{email}', '{phone_number}');
+                    """
+                    cur.execute(query)
                 
 
             return JsonResponse({"message": "Member added successfully!"}, status=200)
@@ -52,18 +59,24 @@ def add_employee(request):
 
             # Insert employee data into the "Employees" table
             with connection.cursor() as cur:
-                query = f"""
-                    INSERT INTO Employees (Employee_id, Employee_Role, Hired_Date, First_Name, Last_Name, Email, Phone_Number)
-                    VALUES ({employee_id}, '{employee_role}', '{hired_date}', '{first_name}', '{last_name}', '{email}', '{phone_number}');
-                """
+                query = f"SELECT Employee_id FROM Employees WHERE Employee_id = {employee_id};"
                 cur.execute(query)
-
-            # Commit the transaction
-            #conn.commit()
-
-            # Close the cursor and connection
-            #cur.close()
-            #conn.close()
+                existing_member = cur.fetchone()
+                
+                if existing_member:
+                    query = f"""
+                        UPDATE Employees
+                        SET Employee_Role='{employee_role}', First_Name='{first_name}', Last_Name='{last_name}', Email='{email}', Phone_Number='{phone_number}'
+                        WHERE Employee_id = {employee_id};
+                    """
+                    cur.execute(query)
+                
+                else:
+                    query = f"""
+                        INSERT INTO Employees (Employee_id, Employee_Role, Hired_Date, First_Name, Last_Name, Email, Phone_Number)
+                        VALUES ({employee_id}, '{employee_role}', '{hired_date}', '{first_name}', '{last_name}', '{email}', '{phone_number}');
+                    """
+                    cur.execute(query)
 
             return JsonResponse({"message": "Employee added successfully!"}, status=200)
         except Exception as e:
@@ -153,7 +166,6 @@ def borrow(request):
         try:
             # Extract borrowed book data from the request
             body = request.POST
-            # borrow_id = body.get("Borrow_id")
             book_id = body.get("Book_id")
             member_id = body.get("Member_id")
             borrow_date = body.get("Borrow_Date")
@@ -178,7 +190,6 @@ def return_book(request):
             body = request.POST
             book_id = body.get('Book_id')
             member_id = body.get('Member_id')
-            # borrow_date = body.get('Borrow_Date')
             return_date = body.get('Return_Date')  # This can be None if not provided
 
             # Call the Return_book procedure
