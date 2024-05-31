@@ -38,3 +38,7 @@ def return_book(borrow: dict):
 def delete_book(book: dict):
     res = requests.post(url=BASE_URL + "delete-book/", data=book)
     return res
+
+def search_book(title):
+    res = requests.get(url=BASE_URL + f"search-book/{title}")
+    return res

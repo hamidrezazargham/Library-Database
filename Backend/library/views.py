@@ -11,7 +11,7 @@ def add_member(request):
     if request.method == "POST":
         try:
             # Extract member data from the request
-            body = json.loads(request.body)
+            body = request.POST
             member_id = body.get("Member_id")
             address = body.get("Address")
             join_date = body.get("Join_Date")
@@ -22,10 +22,11 @@ def add_member(request):
 
             # Insert member data into the "Members" table
             with connection.cursor() as cur:
-                cur.execute("""
+                query = f"""
                     INSERT INTO Members (Member_id, Address, Join_Date, First_Name, Last_Name, Email, Phone_Number)
-                    VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s');
-                """, (member_id, address, join_date, first_name, last_name, email, phone_number))
+                    VALUES ({member_id}, '{address}', '{join_date}', '{first_name}', '{last_name}', '{email}', '{phone_number}');
+                """
+                cur.execute(query)
                 
 
             return JsonResponse({"message": "Member added successfully!"}, status=200)
@@ -40,7 +41,7 @@ def add_employee(request):
     if request.method == "POST":
         try:
             # Extract employee data from the request
-            body = json.loads(request.body)
+            body = request.POST
             employee_id = body.get("Employee_id")
             employee_role = body.get("Employee_Role")
             hired_date = body.get("Hired_Date")
@@ -51,10 +52,11 @@ def add_employee(request):
 
             # Insert employee data into the "Employees" table
             with connection.cursor() as cur:
-                cur.execute("""
+                query = f"""
                     INSERT INTO Employees (Employee_id, Employee_Role, Hired_Date, First_Name, Last_Name, Email, Phone_Number)
-                    VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s');
-                """, (employee_id, employee_role, hired_date, first_name, last_name, email, phone_number))
+                    VALUES ({employee_id}, '{employee_role}', '{hired_date}', '{first_name}', '{last_name}', '{email}', '{phone_number}');
+                """
+                cur.execute(query)
 
             # Commit the transaction
             #conn.commit()
@@ -74,7 +76,7 @@ def add_author(request):
     if request.method == "POST":
         try:
             # Extract author data from the request
-            body = json.loads(request.body)
+            body = request.POST
             author_id = body.get("Author_id")
             first_name = body.get("First_Name")
             last_name = body.get("Last_Name")
@@ -83,10 +85,11 @@ def add_author(request):
 
             # Insert author data into the "Authors" table
             with connection.cursor() as cur:
-                cur.execute("""
+                query = f"""
                     INSERT INTO Authors (Author_id, First_Name, Last_Name, Email, Phone_Number)
-                    VALUES (%s, '%s', '%s', '%s', '%s');
-                """, (author_id, first_name, last_name, email, phone_number))
+                    VALUES ({author_id}, '{first_name}', '{last_name}', '{email}', '{phone_number}');
+                """
+                cur.execute(query)
 
 
             return JsonResponse({"message": "Author added successfully!"}, status=200)
@@ -101,7 +104,7 @@ def add_book(request):
     if request.method == "POST":
         try:
             # Extract book data from the request
-            body = json.loads(request.body)
+            body = request.POST
             book_id = body.get("Book_id")
             title = body.get("Title")
             author_id = body.get("Author_id")
@@ -111,18 +114,21 @@ def add_book(request):
 
             # Check if the book already exists
             with connection.cursor() as cur:
-                cur.execute("SELECT Available_Copies FROM Books WHERE Book_id = %s;", (book_id,))
+                query = f"SELECT Available_Copies FROM Books WHERE Book_id = {book_id};"
+                cur.execute(query)
                 existing_copies = cur.fetchone()
 
                 if existing_copies:
                     # Book exists, increment Available_Copies
-                    cur.execute("UPDATE Books SET Available_Copies = Available_Copies + %s WHERE Book_id = %s;", (copies, book_id))
+                    query = f"UPDATE Books SET Available_Copies = Available_Copies + {copies} WHERE Book_id = {book_id};"
+                    cur.execute(query)
                 else:
                     # Book doesn't exist, insert a new record
-                    cur.execute("""
+                    query = f"""
                         INSERT INTO Books (Book_id, Title, Author_id, Published_Year, Genre, Available_Copies)
-                        VALUES (%s, '%s', %s, '%s', '%s', %s);
-                    """, (book_id, title, author_id, published_year, genre, copies))
+                        VALUES ({book_id}, '{title}', {author_id}, '{published_year}', '{genre}', {copies});
+                    """
+                    cur.execute(query)
 
             return JsonResponse({"message": "Book added successfully!"}, status=200)
         except Exception as e:
@@ -131,11 +137,22 @@ def add_book(request):
         return JsonResponse({"error": "Invalid request method. Use POST."}, status=400)
 
 
+def search_book(request, title):
+    with connection.cursor() as cur:
+        query = f"SELECT Available_Copies, Book_id FROM Books WHERE Title = '{title}';"
+        cur.execute(query)
+        book = cur.fetchone()
+    if book:
+        return JsonResponse({"Book_id": book[1], "Copies": book[0]}, status=200)
+    else:
+        return JsonResponse({"message": "Book not found!"}, status=500)
+
+
 def borrow(request):
     if request.method == "POST":
         try:
             # Extract borrowed book data from the request
-            body = json.loads(request.body)
+            body = request.POST
             # borrow_id = body.get("Borrow_id")
             book_id = body.get("Book_id")
             member_id = body.get("Member_id")
@@ -143,7 +160,8 @@ def borrow(request):
 
             # Call the Borrow procedure
             with connection.cursor() as cur:
-                cur.callproc("Borrow", [book_id, member_id, borrow_date])
+                query = f"CALL Borrow({book_id}, {member_id}, '{borrow_date}');"
+                cur.execute(query)
 
             return JsonResponse({"message": "Book borrowed successfully!"}, status=200)
         except Exception as e:
@@ -157,7 +175,7 @@ def return_book(request):
     if request.method == "POST":
         try:
             # Extract data from the request
-            body = json.loads(request.body)
+            body = request.POST
             book_id = body.get('Book_id')
             member_id = body.get('Member_id')
             # borrow_date = body.get('Borrow_Date')
@@ -165,7 +183,8 @@ def return_book(request):
 
             # Call the Return_book procedure
             with connection.cursor() as cur:
-                cur.callproc('Return_book', [book_id, member_id, return_date])
+                query = f"CALL Return_book({book_id}, {member_id}, '{return_date}');"
+                cur.execute(query)
                 
 
             return JsonResponse({'message': 'Book borrowed successfully!'}, status=200)
@@ -180,18 +199,20 @@ def delete_book(request):
     if request.method == "POST":
         try:
             # Extract book data from the request
-            body = json.loads(request.body)
+            body = request.POST
             book_id = body.get("Book_id")
-            copies = body.get("Copies")
+            copies = int(body.get("Copies"))
 
             # Check if the book already exists
             with connection.cursor() as cur:
-                cur.execute("SELECT Available_Copies FROM Books WHERE Book_id = %s;", (book_id,))
+                query = f"SELECT Available_Copies FROM Books WHERE Book_id = {book_id};"
+                cur.execute(query)
                 existing_copies = cur.fetchone()
 
                 if existing_copies:
                     # Book exists, decrement Available_Copies
-                    cur.execute("UPDATE Books SET Available_Copies = %s WHERE Book_id = %s;", (max(existing_copies[0] - copies, 0), book_id))
+                    query = f"UPDATE Books SET Available_Copies = {max(existing_copies[0] - copies, 0)} WHERE Book_id = {book_id};"
+                    cur.execute(query)
                 else:
                     # Book doesn't exist
                     return JsonResponse({'error': 'Book not found'}, status=404)
