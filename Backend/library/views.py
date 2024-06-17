@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.db import connection
+import logging
 
 def add_member(request):
     if request.method == "POST":
@@ -253,3 +254,123 @@ def get_users(request):
     except Exception as e:
         # Something else went wrong
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+    def add_member_logs(member_id, first_name, last_name):
+    try:
+
+        # Call the member_log stored procedure
+        #cur.callproc('Member_logs', (member_id, first_name, last_name))
+
+        # Call the Member_logs procedure
+        with connection.cursor() as cur:
+                query = f"CALL Member_logs({member_id}, {first_name}, '{last_name}');"
+                cur.execute(query)
+
+        # Log the addition
+        logging.basicConfig(filename='myapp.log', level=logging.INFO)
+        logging.info(f"Member added: ID={member_id}, Name={first_name} {last_name}")
+
+        return True  # Successfully logged
+
+    except Exception as e:
+        # Handle exceptions (e.g., connection errors)
+        logging.error(f"Error logging member: {e}")
+        return False
+
+
+
+def add_employee_logs(employee_id, first_name, last_name):
+    try:
+
+        # Call the stored procedure 
+        #cur.callproc('Employee_logs', (employee_id, first_name, last_name))
+
+        # Call the Employee_logs procedure
+        with connection.cursor() as cur:
+                query = f"CALL Employee_logs({employee_id}, {first_name}, '{last_name}');"
+                cur.execute(query)
+
+        # Log the addition
+        logging.basicConfig(filename='myapp.log', level=logging.INFO)
+        logging.info(f"Employee added: ID={employee_id}, Name={first_name} {last_name}")
+
+        return True  # Successfully logged
+
+    except Exception as e:
+        # Handle exceptions (e.g., connection errors)
+        logging.error(f"Error logging employee: {e}")
+        return False
+
+
+
+def add_book_logs(book_id, title, genre):
+    try:
+
+        # Call the stored procedure for logging
+        #cur.callproc('book_log', (book_id, title, genre))
+
+        # Call the book_log procedure
+        with connection.cursor() as cur:
+                query = f"CALL book_log({book_id}, {title}, '{genre}');"
+                cur.execute(query)
+
+        # Log the addition
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s')
+        logging.info(f"Book added: ID={book_id}, Title='{title}', Genre='{genre}'")
+
+        return True  # Successfully logged
+
+    except Exception as e:
+        # Handle exceptions (e.g., connection errors)
+        logging.error(f"Error logging member: {e}")
+        return False
+    
+
+
+def add_author_logs(author_id, first_name, last_name):
+    try:
+
+        # Call the stored procedure for logging
+        #cur.callproc('author_log', (author_id, first_name, last_name))
+
+        # Call the author_log procedure
+        with connection.cursor() as cur:
+                query = f"CALL author_log({author_id}, {first_name}, '{last_name}');"
+                cur.execute(query)
+
+        # Log the addition
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s')
+        logging.info(f"Author added: ID={author_id}, Name={first_name} {last_name}")
+
+
+        return True  # Successfully logged
+
+    except Exception as e:
+        # Handle exceptions (e.g., connection errors)
+        logging.error(f"Error logging member: {e}")
+        return False
+
+
+
+def delete_book_logs(book_id, title, genre):
+    try:
+
+        # Call the stored procedure for logging (assuming it exists)
+        #cur.callproc('Delete_book_log', (book_id, title, genre))
+
+        # Call the Delete_book_log procedure
+        with connection.cursor() as cur:
+                query = f"CALL Delete_book_log({book_id}, {title}, '{genre}');"
+                cur.execute(query)
+
+        # Log the deletion
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s')
+        logging.info(f"Book deleted: ID={book_id}, Title='{title}', Genre='{genre}'")
+
+        return True  # Successfully logged
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return False
+
