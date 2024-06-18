@@ -397,7 +397,7 @@ def borrows_log(request):
         changed_date = []
         for i in range(len(rows)):
             new_datas.append(json.loads(rows[i][1]))
-            if rows[i][1] is not None:
+            if rows[i][0] is not None:
                 old_datas.append(json.loads(rows[i][0]))
             else:
                 old_datas.append(None)
@@ -425,7 +425,7 @@ def returns_log(request):
         changed_date = []
         for i in range(len(rows)):
             new_datas.append(json.loads(rows[i][1]))
-            if rows[i][1] is not None:
+            if rows[i][0] is not None:
                 old_datas.append(json.loads(rows[i][0]))
             else:
                 old_datas.append(None)
