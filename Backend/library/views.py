@@ -256,7 +256,7 @@ def get_users(request):
         return JsonResponse({'error': str(e)}, status=500)
     
 
-    def add_member_logs(member_id, first_name, last_name):
+def add_member_logs(member_id, first_name, last_name):
     try:
 
         # Call the member_log stored procedure
