@@ -294,22 +294,20 @@ def authors_log(request):
         with connection.cursor() as cur:
             cur.execute("SELECT * FROM authors_changes;")
             rows = cur.fetchall()
-        Member_id = []
+
         operation = []
         new_datas = []
         old_datas = []
         changed_date = []
         for i in range(len(rows)):
-            new_datas.append(json.loads(rows[i][3]))
-            old_datas.append(json.loads(rows[i][2]))
-            changed_date.append(rows[i][4])
-            Member_id.append(rows[i][0])
-            operation.append(rows[i][1])
+            new_datas.append(json.loads(rows[i][2]))
+            old_datas.append(json.loads(rows[i][1]))
+            changed_date.append(rows[i][3])
+            operation.append(rows[i][0])
         res = {
             "new_datas": new_datas,
             "old_datas": old_datas,
             "changed_date": changed_date,
-            "Member_id": Member_id,
             "operation": operation
         }
     
@@ -326,22 +324,19 @@ def members_log(request):
         with connection.cursor() as cur:
             cur.execute("SELECT * FROM members_changes;")
             rows = cur.fetchall()
-        Member_id = []
         operation = []
         new_datas = []
         old_datas = []
         changed_date = []
         for i in range(len(rows)):
-            new_datas.append(json.loads(rows[i][3]))
-            old_datas.append(json.loads(rows[i][2]))
-            changed_date.append(rows[i][4])
-            Member_id.append(rows[i][0])
-            operation.append(rows[i][1])
+            new_datas.append(json.loads(rows[i][2]))
+            old_datas.append(json.loads(rows[i][1]))
+            changed_date.append(rows[i][3])
+            operation.append(rows[i][0])
         res = {
             "new_datas": new_datas,
             "old_datas": old_datas,
             "changed_date": changed_date,
-            "Member_id": Member_id,
             "operation": operation
         }
     
@@ -357,22 +352,19 @@ def employees_log(request):
         with connection.cursor() as cur:
             cur.execute("SELECT * FROM employees_changes;")
             rows = cur.fetchall()
-        Member_id = []
         operation = []
         new_datas = []
         old_datas = []
         changed_date = []
         for i in range(len(rows)):
-            new_datas.append(json.loads(rows[i][3]))
-            old_datas.append(json.loads(rows[i][2]))
-            changed_date.append(rows[i][4])
-            Member_id.append(rows[i][0])
-            operation.append(rows[i][1])
+            new_datas.append(json.loads(rows[i][2]))
+            old_datas.append(json.loads(rows[i][1]))
+            changed_date.append(rows[i][3])
+            operation.append(rows[i][0])
         res = {
             "new_datas": new_datas,
             "old_datas": old_datas,
             "changed_date": changed_date,
-            "Member_id": Member_id,
             "operation": operation
         }
     
