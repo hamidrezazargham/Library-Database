@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.db import connection
-import logging
+import json
+
 
 def add_member(request):
     if request.method == "POST":
@@ -256,121 +257,178 @@ def get_users(request):
         return JsonResponse({'error': str(e)}, status=500)
     
 
-def add_member_logs(member_id, first_name, last_name):
+
+
+
+def books_log(request):
     try:
-
-        # Call the member_log stored procedure
-        #cur.callproc('Member_logs', (member_id, first_name, last_name))
-
-        # Call the Member_logs procedure
         with connection.cursor() as cur:
-                query = f"CALL Member_logs({member_id}, {first_name}, '{last_name}');"
-                cur.execute(query)
-
-        # Log the addition
-        logging.basicConfig(filename='myapp.log', level=logging.INFO)
-        logging.info(f"Member added: ID={member_id}, Name={first_name} {last_name}")
-
-        return True  # Successfully logged
-
+            cur.execute("SELECT * FROM books_changes;")
+            rows = cur.fetchall()
+        operation = []
+        new_datas = []
+        old_datas = []
+        changed_date = []
+        for i in range(len(rows)):
+            new_datas.append(json.loads(rows[i][2]))
+            old_datas.append(json.loads(rows[i][1]))
+            changed_date.append(rows[i][3])
+            operation.append(rows[i][0])
+        res = {
+            "new_datas": new_datas,
+            "old_datas": old_datas,
+            "changed_date": changed_date,
+            "operation": operation
+        }
+    
+        return JsonResponse(res, status=200)
+    
     except Exception as e:
-        # Handle exceptions (e.g., connection errors)
-        logging.error(f"Error logging member: {e}")
-        return False
-
-
-
-def add_employee_logs(employee_id, first_name, last_name):
-    try:
-
-        # Call the stored procedure 
-        #cur.callproc('Employee_logs', (employee_id, first_name, last_name))
-
-        # Call the Employee_logs procedure
-        with connection.cursor() as cur:
-                query = f"CALL Employee_logs({employee_id}, {first_name}, '{last_name}');"
-                cur.execute(query)
-
-        # Log the addition
-        logging.basicConfig(filename='myapp.log', level=logging.INFO)
-        logging.info(f"Employee added: ID={employee_id}, Name={first_name} {last_name}")
-
-        return True  # Successfully logged
-
-    except Exception as e:
-        # Handle exceptions (e.g., connection errors)
-        logging.error(f"Error logging employee: {e}")
-        return False
-
-
-
-def add_book_logs(book_id, title, genre):
-    try:
-
-        # Call the stored procedure for logging
-        #cur.callproc('book_log', (book_id, title, genre))
-
-        # Call the book_log procedure
-        with connection.cursor() as cur:
-                query = f"CALL book_log({book_id}, {title}, '{genre}');"
-                cur.execute(query)
-
-        # Log the addition
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s')
-        logging.info(f"Book added: ID={book_id}, Title='{title}', Genre='{genre}'")
-
-        return True  # Successfully logged
-
-    except Exception as e:
-        # Handle exceptions (e.g., connection errors)
-        logging.error(f"Error logging member: {e}")
-        return False
+        # Something else went wrong
+        return JsonResponse({'error': str(e)}, status=500)
     
 
 
-def add_author_logs(author_id, first_name, last_name):
+def authors_log(request):
     try:
-
-        # Call the stored procedure for logging
-        #cur.callproc('author_log', (author_id, first_name, last_name))
-
-        # Call the author_log procedure
         with connection.cursor() as cur:
-                query = f"CALL author_log({author_id}, {first_name}, '{last_name}');"
-                cur.execute(query)
-
-        # Log the addition
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s')
-        logging.info(f"Author added: ID={author_id}, Name={first_name} {last_name}")
-
-
-        return True  # Successfully logged
-
+            cur.execute("SELECT * FROM authors_changes;")
+            rows = cur.fetchall()
+        Member_id = []
+        operation = []
+        new_datas = []
+        old_datas = []
+        changed_date = []
+        for i in range(len(rows)):
+            new_datas.append(json.loads(rows[i][3]))
+            old_datas.append(json.loads(rows[i][2]))
+            changed_date.append(rows[i][4])
+            Member_id.append(rows[i][0])
+            operation.append(rows[i][1])
+        res = {
+            "new_datas": new_datas,
+            "old_datas": old_datas,
+            "changed_date": changed_date,
+            "Member_id": Member_id,
+            "operation": operation
+        }
+    
+        return JsonResponse(res, status=200)
+    
     except Exception as e:
-        # Handle exceptions (e.g., connection errors)
-        logging.error(f"Error logging member: {e}")
-        return False
+        # Something else went wrong
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 
-def delete_book_logs(book_id, title, genre):
+def members_log(request):
     try:
-
-        # Call the stored procedure for logging (assuming it exists)
-        #cur.callproc('Delete_book_log', (book_id, title, genre))
-
-        # Call the Delete_book_log procedure
         with connection.cursor() as cur:
-                query = f"CALL Delete_book_log({book_id}, {title}, '{genre}');"
-                cur.execute(query)
-
-        # Log the deletion
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s :: %(levelname)s :: %(message)s')
-        logging.info(f"Book deleted: ID={book_id}, Title='{title}', Genre='{genre}'")
-
-        return True  # Successfully logged
-
+            cur.execute("SELECT * FROM members_changes;")
+            rows = cur.fetchall()
+        Member_id = []
+        operation = []
+        new_datas = []
+        old_datas = []
+        changed_date = []
+        for i in range(len(rows)):
+            new_datas.append(json.loads(rows[i][3]))
+            old_datas.append(json.loads(rows[i][2]))
+            changed_date.append(rows[i][4])
+            Member_id.append(rows[i][0])
+            operation.append(rows[i][1])
+        res = {
+            "new_datas": new_datas,
+            "old_datas": old_datas,
+            "changed_date": changed_date,
+            "Member_id": Member_id,
+            "operation": operation
+        }
+    
+        return JsonResponse(res, status=200)
+    
     except Exception as e:
-        print(f"Error: {e}")
-        return False
+        # Something else went wrong
+        return JsonResponse({'error': str(e)}, status=500)
+    
+    
+def employees_log(request):
+    try:
+        with connection.cursor() as cur:
+            cur.execute("SELECT * FROM employees_changes;")
+            rows = cur.fetchall()
+        Member_id = []
+        operation = []
+        new_datas = []
+        old_datas = []
+        changed_date = []
+        for i in range(len(rows)):
+            new_datas.append(json.loads(rows[i][3]))
+            old_datas.append(json.loads(rows[i][2]))
+            changed_date.append(rows[i][4])
+            Member_id.append(rows[i][0])
+            operation.append(rows[i][1])
+        res = {
+            "new_datas": new_datas,
+            "old_datas": old_datas,
+            "changed_date": changed_date,
+            "Member_id": Member_id,
+            "operation": operation
+        }
+    
+        return JsonResponse(res, status=200)
+    
+    except Exception as e:
+        # Something else went wrong
+        return JsonResponse({'error': str(e)}, status=500)
 
+
+def borrows_log(request):
+    try:
+        with connection.cursor() as cur:
+            cur.execute("SELECT * FROM borrowed_books_changes;")
+            rows = cur.fetchall()
+        new_datas = []
+        old_datas = []
+        changed_date = []
+        for i in range(len(rows)):
+            new_datas.append(json.loads(rows[i][1]))
+            old_datas.append(json.loads(rows[i][0]))
+            changed_date.append(rows[i][2])
+
+        res = {
+            "new_datas": new_datas,
+            "old_datas": old_datas,
+            "changed_date": changed_date
+        }
+    
+        return JsonResponse(res, status=200)
+    
+    except Exception as e:
+        # Something else went wrong
+        return JsonResponse({'error': str(e)}, status=500)
+    
+def returns_log(request):
+    try:
+        with connection.cursor() as cur:
+            cur.execute("SELECT * FROM returned_books_changes;")
+            rows = cur.fetchall()
+        new_datas = []
+        old_datas = []
+        changed_date = []
+        for i in range(len(rows)):
+            new_datas.append(json.loads(rows[i][1]))
+            old_datas.append(json.loads(rows[i][0]))
+            changed_date.append(rows[i][2])
+
+        res = {
+            "new_datas": new_datas,
+            "old_datas": old_datas,
+            "changed_date": changed_date
+        }
+    
+        return JsonResponse(res, status=200)
+    
+    except Exception as e:
+        # Something else went wrong
+        return JsonResponse({'error': str(e)}, status=500)
