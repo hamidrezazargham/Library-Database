@@ -271,7 +271,10 @@ def books_log(request):
         changed_date = []
         for i in range(len(rows)):
             new_datas.append(json.loads(rows[i][2]))
-            old_datas.append(json.loads(rows[i][1]))
+            if rows[i][1] is not None:
+                old_datas.append(json.loads(rows[i][1]))
+            else:
+                old_datas.append(None)
             changed_date.append(rows[i][3])
             operation.append(rows[i][0])
         res = {
@@ -301,7 +304,10 @@ def authors_log(request):
         changed_date = []
         for i in range(len(rows)):
             new_datas.append(json.loads(rows[i][2]))
-            old_datas.append(json.loads(rows[i][1]))
+            if rows[i][1] is not None:
+                old_datas.append(json.loads(rows[i][1]))
+            else:
+                old_datas.append(None)
             changed_date.append(rows[i][3])
             operation.append(rows[i][0])
         res = {
@@ -330,7 +336,10 @@ def members_log(request):
         changed_date = []
         for i in range(len(rows)):
             new_datas.append(json.loads(rows[i][2]))
-            old_datas.append(json.loads(rows[i][1]))
+            if rows[i][1] is not None:
+                old_datas.append(json.loads(rows[i][1]))
+            else:
+                old_datas.append(None)
             changed_date.append(rows[i][3])
             operation.append(rows[i][0])
         res = {
@@ -358,7 +367,10 @@ def employees_log(request):
         changed_date = []
         for i in range(len(rows)):
             new_datas.append(json.loads(rows[i][2]))
-            old_datas.append(json.loads(rows[i][1]))
+            if rows[i][1] is not None:
+                old_datas.append(json.loads(rows[i][1]))
+            else:
+                old_datas.append(None)
             changed_date.append(rows[i][3])
             operation.append(rows[i][0])
         res = {
@@ -385,7 +397,10 @@ def borrows_log(request):
         changed_date = []
         for i in range(len(rows)):
             new_datas.append(json.loads(rows[i][1]))
-            old_datas.append(json.loads(rows[i][0]))
+            if rows[i][1] is not None:
+                old_datas.append(json.loads(rows[i][0]))
+            else:
+                old_datas.append(None)
             changed_date.append(rows[i][2])
 
         res = {
@@ -410,7 +425,10 @@ def returns_log(request):
         changed_date = []
         for i in range(len(rows)):
             new_datas.append(json.loads(rows[i][1]))
-            old_datas.append(json.loads(rows[i][0]))
+            if rows[i][1] is not None:
+                old_datas.append(json.loads(rows[i][0]))
+            else:
+                old_datas.append(None)
             changed_date.append(rows[i][2])
 
         res = {
