@@ -10,6 +10,8 @@ First, create a database and run .sql scripts in the repository with the given o
 3. Views.sql
 4. Functions.sql
 5. Procedures.sql
+6. Logging Triggers.sql
+7. Logging Views.sql
 
 After that, Install the required packages:
 

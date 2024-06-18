@@ -1,2 +1,7 @@
 tests/__pycache__
 tests/data.py
+
+Backend/back/__pycache__
+Backend/library/__pycache__
+
+Frontend/__pycache__

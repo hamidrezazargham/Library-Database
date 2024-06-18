@@ -41,3 +41,27 @@ def delete_book(book: dict):
 def search_book(title):
     res = requests.get(url=BASE_URL + f"search-book/{title}")
     return res
+
+def members_log():
+    response = requests.get(url=BASE_URL + "members-log/")
+    return response.json()
+
+def employees_log():
+    response = requests.get(url=BASE_URL + "employees-log/")
+    return response.json()
+
+def authors_log():
+    response = requests.get(url=BASE_URL + "authors-log/")
+    return response.json()
+
+def books_log():
+    response = requests.get(url=BASE_URL + "books-log/")
+    return response.json()
+
+def borrows_log():
+    response = requests.get(url=BASE_URL + "borrows-log/")
+    return response.json()
+
+def returns_log():
+    response = requests.get(url=BASE_URL + "returns-log/")
+    return response.json()

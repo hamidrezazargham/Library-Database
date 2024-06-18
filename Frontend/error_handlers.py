@@ -22,3 +22,7 @@ def access_denied() -> str:
 def book_not_found() -> str:
     response = markdown_parse("I couldn't find your book!")
     return response
+
+def no_logs() -> str:
+    response = markdown_parse("There is no logs to show!")
+    return response

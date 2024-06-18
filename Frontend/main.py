@@ -21,6 +21,7 @@ import telegram_funcs as tf
 import error_handlers
 import data as Data
 import stickers
+import emojies
 import db_scripts
 
 
@@ -42,6 +43,11 @@ LOAD_NEWS = "load_news"
 NEWS_EXPIRED = "news_expired"
 MEMBER = "Member"
 EMPLOYEE = "Employee"
+
+ACTIVE, EXPIRED = range(2)
+
+LIST_LENGTH = 10
+MEMBERS_LIST_LENGTH = 4
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -609,6 +615,7 @@ async def expired(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await query.edit_message_reply_markup(reply_markup=None)
     return None
 
+
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     username = user.username if user.username is not None else user.full_name
@@ -642,6 +649,579 @@ async def profile(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             role=context.user_data['Employee_Role']
         )
     await tf.send_message(update, response)
+
+
+async def members_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    
+    if context.user_data.get('role') != EMPLOYEE:
+        response = error_handlers.access_denied()
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['bite me'])
+        
+        return ConversationHandler.END
+    
+    head = 0
+    context.user_data['members_log_ind'] = head
+    
+    data = db_scripts.members_log()
+    data_length = len(data['changed_date'])
+    if data_length == 0:
+        logger.info("%s want to see members log - no logs found", username)
+        response = error_handlers.no_logs()
+
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['disappointed'])
+        return ConversationHandler.END
+    
+    if data_length <= MEMBERS_LIST_LENGTH:
+        logger.info("%s want to see members log - just one page", username)
+        response = members_changes(data, head, data_length)
+
+        await tf.send_message(update, response)
+        return ConversationHandler.END
+    
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_members'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    response = members_changes(data, head, head + MEMBERS_LIST_LENGTH)
+    await tf.send_message(update, response, reply_markup=reply_markup)
+    return ACTIVE
+
+
+async def members_log_next_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['members_log_ind'] + MEMBERS_LIST_LENGTH
+    logger.info("%s - members log conversation - [%s : %s]",
+                username, head, head + MEMBERS_LIST_LENGTH)
+    data = db_scripts.members_log()
+    data_length = len(data['changed_date'])
+    
+    keyboard = [
+        [InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_members')]
+    ]
+    if head + MEMBERS_LIST_LENGTH < data_length:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_members'))
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['members_log_ind'] = head
+    response = members_changes(data, head, min(head + MEMBERS_LIST_LENGTH, data_length))
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
+async def members_log_previous_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['members_log_ind'] - MEMBERS_LIST_LENGTH
+    logger.info("%s - members log conversation - [%s : %s]",
+                username, head, head + MEMBERS_LIST_LENGTH)
+    data = db_scripts.members_log()
+    
+    keyboard = [
+        []
+    ]
+    if head - MEMBERS_LIST_LENGTH >= 0:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_members'))
+    keyboard[0].append(InlineKeyboardButton(
+        emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_members'))
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['members_log_ind'] = head
+    response = members_changes(data, head, head + MEMBERS_LIST_LENGTH)
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
+async def employees_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    
+    if context.user_data.get('role') != EMPLOYEE:
+        response = error_handlers.access_denied()
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['bite me'])
+        
+        return ConversationHandler.END
+    
+    head = 0
+    context.user_data['employees_log_ind'] = head
+    
+    data = db_scripts.employees_log()
+    data_length = len(data['changed_date'])
+    if data_length == 0:
+        logger.info("%s want to see employees log - no logs found", username)
+        response = error_handlers.no_logs()
+
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['disappointed'])
+        return ConversationHandler.END
+    
+    if data_length <= MEMBERS_LIST_LENGTH:
+        logger.info("%s want to see employees log - just one page", username)
+        response = employees_changes(data, head, data_length)
+
+        await tf.send_message(update, response)
+        return ConversationHandler.END
+    
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_employees'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    response = employees_changes(data, head, head + MEMBERS_LIST_LENGTH)
+    await tf.send_message(update, response, reply_markup=reply_markup)
+    return ACTIVE
+
+
+async def employees_log_next_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['employees_log_ind'] + MEMBERS_LIST_LENGTH
+    logger.info("%s - employees log conversation - [%s : %s]",
+                username, head, head + MEMBERS_LIST_LENGTH)
+    data = db_scripts.employees_log()
+    data_length = len(data['changed_date'])
+    
+    keyboard = [
+        [InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_employees')]
+    ]
+    if head + MEMBERS_LIST_LENGTH < data_length:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_employees'))
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    response = employees_changes(data, head, min(head + MEMBERS_LIST_LENGTH, data_length))
+    context.user_data['employees_log_ind'] = head
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
+async def employees_log_previous_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['employees_log_ind'] - MEMBERS_LIST_LENGTH
+    logger.info("%s - employees log conversation - [%s : %s]",
+                username, head, head + MEMBERS_LIST_LENGTH)
+    data = db_scripts.employees_log()
+    
+    keyboard = [
+        []
+    ]
+    if head - MEMBERS_LIST_LENGTH >= 0:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_employees'))
+    keyboard[0].append(InlineKeyboardButton(
+        emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_employees'))
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['employees_log_ind'] = head
+    response = employees_changes(data, head, head + MEMBERS_LIST_LENGTH)
+    await tf.send_message(update, response, reply_markup=reply_markup)
+    return ACTIVE
+
+
+async def authors_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    
+    if context.user_data.get('role') != EMPLOYEE:
+        response = error_handlers.access_denied()
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['bite me'])
+        
+        return ConversationHandler.END
+    
+    head = 0
+    context.user_data['authors_log_ind'] = head
+    
+    data = db_scripts.authors_log()
+    data_length = len(data['changed_date'])
+    if data_length == 0:
+        logger.info("%s want to see authors log - no logs found", username)
+        response = error_handlers.no_logs()
+
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['disappointed'])
+        return ConversationHandler.END
+    
+    if data_length <= MEMBERS_LIST_LENGTH:
+        logger.info("%s want to see authors log - just one page", username)
+        response = authors_changes(data, head, data_length)
+
+        await tf.send_message(update, response)
+        return ConversationHandler.END
+    
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_authors'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    response = authors_changes(data, head, head + MEMBERS_LIST_LENGTH)
+    await tf.send_message(update, response, reply_markup=reply_markup)
+    return ACTIVE
+
+
+async def authors_log_next_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['authors_log_ind'] + MEMBERS_LIST_LENGTH
+    logger.info("%s - authors log conversation - [%s : %s]",
+                username, head, head + MEMBERS_LIST_LENGTH)
+    data = db_scripts.authors_log()
+    data_length = len(data['changed_date'])
+    
+    keyboard = [
+        [InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_authors')]
+    ]
+    if head + MEMBERS_LIST_LENGTH < data_length:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_authors'))
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['authors_log_ind'] = head
+    response = authors_changes(data, head, min(head + MEMBERS_LIST_LENGTH, data_length))
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
+async def authors_log_previous_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['authors_log_ind'] - MEMBERS_LIST_LENGTH
+    logger.info("%s - authors log conversation - [%s : %s]",
+                username, head, head + MEMBERS_LIST_LENGTH)
+    data = db_scripts.authors_log()
+    
+    keyboard = [
+        []
+    ]
+    if head - MEMBERS_LIST_LENGTH >= 0:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_authors'))
+    keyboard[0].append(InlineKeyboardButton(
+        emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_authors'))
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['authors_log_ind'] = head
+    response = authors_changes(data, head, head + MEMBERS_LIST_LENGTH)
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
+async def books_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    
+    if context.user_data.get('role') != EMPLOYEE:
+        response = error_handlers.access_denied()
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['bite me'])
+        
+        return ConversationHandler.END
+    
+    head = 0
+    context.user_data['books_log_ind'] = head
+    
+    data = db_scripts.books_log()
+    data_length = len(data['changed_date'])
+    if data_length == 0:
+        logger.info("%s want to see books log - no logs found", username)
+        response = error_handlers.no_logs()
+
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['disappointed'])
+        return ConversationHandler.END
+    
+    if data_length <= MEMBERS_LIST_LENGTH:
+        logger.info("%s want to see books log - just one page", username)
+        response = books_changes(data, head, data_length)
+
+        await tf.send_message(update, response)
+        return ConversationHandler.END
+    
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_books'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    response = books_changes(data, head, head + MEMBERS_LIST_LENGTH)
+    await tf.send_message(update, response, reply_markup=reply_markup)
+    return ACTIVE
+
+
+async def books_log_next_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['books_log_ind'] + MEMBERS_LIST_LENGTH
+    logger.info("%s - books log conversation - [%s : %s]",
+                username, head, head + MEMBERS_LIST_LENGTH)
+    data = db_scripts.books_log()
+    data_length = len(data['changed_date'])
+    
+    keyboard = [
+        [InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_books')]
+    ]
+    if head + MEMBERS_LIST_LENGTH < data_length:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_books'))
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['books_log_ind'] = head
+    response = books_changes(data, head, min(head + MEMBERS_LIST_LENGTH, data_length))
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
+async def books_log_previous_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['books_log_ind'] - MEMBERS_LIST_LENGTH
+    logger.info("%s - books log conversation - [%s : %s]",
+                username, head, head + MEMBERS_LIST_LENGTH)
+    data = db_scripts.books_log()
+    
+    keyboard = [
+        []
+    ]
+    if head - MEMBERS_LIST_LENGTH >= 0:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_books'))
+    keyboard[0].append(InlineKeyboardButton(
+        emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_books'))
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['books_log_ind'] = head
+    response = books_changes(data, head, head + MEMBERS_LIST_LENGTH)
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
+async def borrows_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    
+    if context.user_data.get('role') != EMPLOYEE:
+        response = error_handlers.access_denied()
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['bite me'])
+        
+        return ConversationHandler.END
+    
+    head = 0
+    context.user_data['borrows_log_ind'] = head
+    
+    data = db_scripts.borrows_log()
+    data_length = len(data['changed_date'])
+    if data_length == 0:
+        logger.info("%s want to see borrows log - no logs found", username)
+        response = error_handlers.no_logs()
+
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['disappointed'])
+        return ConversationHandler.END
+    
+    if data_length <= LIST_LENGTH:
+        logger.info("%s want to see borrows log - just one page", username)
+        response = borrows_changes(data, head, data_length)
+
+        await tf.send_message(update, response)
+        return ConversationHandler.END
+    
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_borrows'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['borrows_log_ind'] = head
+    response = borrows_changes(data, head, head + LIST_LENGTH)
+    await tf.send_message(update, response, reply_markup=reply_markup)
+    return ACTIVE
+
+
+async def borrows_log_next_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['borrows_log_ind'] + LIST_LENGTH
+    logger.info("%s - borrows log conversation - [%s : %s]",
+                username, head, head + LIST_LENGTH)
+    data = db_scripts.borrows_log()
+    data_length = len(data['changed_date'])
+    
+    keyboard = [
+        [InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_borrows')]
+    ]
+    if head + LIST_LENGTH < data_length:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_borrows'))
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['borrows_log_ind'] = head
+    response = borrows_changes(data, head, min(head + LIST_LENGTH, data_length))
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
+async def borrows_log_previous_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['borrows_log_ind'] - LIST_LENGTH
+    logger.info("%s - borrows log conversation - [%s : %s]",
+                username, head, head + LIST_LENGTH)
+    data = db_scripts.borrows_log()
+    
+    keyboard = [
+        []
+    ]
+    if head - LIST_LENGTH >= 0:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_borrows'))
+    keyboard[0].append(InlineKeyboardButton(
+        emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_borrows'))
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['borrows_log_ind'] = head
+    response = borrows_changes(data, head, head + LIST_LENGTH)
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
+async def returns_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    
+    if context.user_data.get('role') != EMPLOYEE:
+        response = error_handlers.access_denied()
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['bite me'])
+        
+        return ConversationHandler.END
+    
+    head = 0
+    context.user_data['returns_log_ind'] = head
+    
+    data = db_scripts.returns_log()
+    data_length = len(data['changed_date'])
+    if data_length == 0:
+        logger.info("%s want to see returns log - no logs found", username)
+        response = error_handlers.no_logs()
+
+        await tf.send_message(update, response, sticker=stickers.BLACK_CHERRY['disappointed'])
+        return ConversationHandler.END
+    
+    if data_length <= LIST_LENGTH:
+        logger.info("%s want to see returns log - just one page", username)
+        response = returns_changes(data, head, data_length)
+
+        await tf.send_message(update, response)
+        return ConversationHandler.END
+    
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_returns'),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    response = returns_changes(data, head, head + LIST_LENGTH)
+    await tf.send_message(update, response, reply_markup=reply_markup)
+    return ACTIVE
+
+
+async def returns_log_next_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['returns_log_ind'] + LIST_LENGTH
+    logger.info("%s - returns log conversation - [%s : %s]",
+                username, head, head + LIST_LENGTH)
+    data = db_scripts.returns_log()
+    data_length = len(data['changed_date'])
+    
+    keyboard = [
+        [InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_returns')]
+    ]
+    if head + LIST_LENGTH < data_length:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_returns'))
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['returns_log_ind'] = head
+    response = returns_changes(data, head, min(head + LIST_LENGTH, data_length))
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
+async def returns_log_previous_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    username = user.username if user.username is not None else user.full_name
+    query = update.callback_query
+    await query.answer()
+    
+    head = context.user_data['returns_log_ind'] - LIST_LENGTH
+    logger.info("%s - returns log conversation - [%s : %s]",
+                username, head, head + LIST_LENGTH)
+    data = db_scripts.returns_log()
+    
+    keyboard = [
+        []
+    ]
+    if head - LIST_LENGTH >= 0:
+        keyboard[0].append(InlineKeyboardButton(
+            emojies.LEFTPOINTING_DOUBLE_TRIANGLE, callback_data='pre_returns'))
+    keyboard[0].append(InlineKeyboardButton(
+        emojies.RIGHTPOINTING_DOUBLE_TRIANGLE, callback_data='next_returns'))
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    context.user_data['returns_log_ind'] = head
+    response = returns_changes(data, head, head + LIST_LENGTH)
+    await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="MarkdownV2")
+    return ACTIVE
+
+
 
 def main() -> None:
     application = Application.builder().token(Data.BOT_API_KEY).build()
@@ -732,11 +1312,96 @@ def main() -> None:
     )
     application.add_handler(add_book_conversation_handler)
     
+    members_changes_conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('memberslog', members_log)],
+        states={
+            ACTIVE: [
+                CallbackQueryHandler(members_log_next_page, pattern="^next_members$"),
+                CallbackQueryHandler(members_log_previous_page, pattern="^pre_members$")
+            ]
+        },
+        fallbacks=[
+            CommandHandler('memberslog', members_log),
+        ]
+    )
+    application.add_handler(members_changes_conversation_handler)
+    
+    employees_changes_conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('employeeslog', employees_log)],
+        states={
+            ACTIVE: [
+                CallbackQueryHandler(employees_log_next_page, pattern="^next_employees$"),
+                CallbackQueryHandler(employees_log_previous_page, pattern="^pre_employees$")
+            ]
+        },
+        fallbacks=[
+            CommandHandler('employeeslog', employees_log),
+        ]
+    )
+    application.add_handler(employees_changes_conversation_handler)
+    
+    authors_changes_conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('authorslog', authors_log)],
+        states={
+            ACTIVE: [
+                CallbackQueryHandler(authors_log_next_page, pattern="^next_authors$"),
+                CallbackQueryHandler(authors_log_previous_page, pattern="^pre_authors$")
+            ]
+        },
+        fallbacks=[
+            CommandHandler('authorslog', authors_log),
+        ]
+    )
+    application.add_handler(authors_changes_conversation_handler)
+    
+    books_changes_conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('bookslog', books_log)],
+        states={
+            ACTIVE: [
+                CallbackQueryHandler(books_log_next_page, pattern="^next_books$"),
+                CallbackQueryHandler(books_log_previous_page, pattern="^pre_books$")
+            ]
+        },
+        fallbacks=[
+            CommandHandler('bookslog', books_log),
+        ]
+    )
+    application.add_handler(books_changes_conversation_handler)
+    
+    borrows_changes_conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('borrowslog', borrows_log)],
+        states={
+            ACTIVE: [
+                CallbackQueryHandler(borrows_log_next_page, pattern="^next_borrows$"),
+                CallbackQueryHandler(borrows_log_previous_page, pattern="^pre_borrows$")
+            ]
+        },
+        fallbacks=[
+            CommandHandler('borrowslog', borrows_log),
+        ]
+    )
+    application.add_handler(borrows_changes_conversation_handler)
+    
+    returns_changes_conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('returnslog', returns_log)],
+        states={
+            ACTIVE: [
+                CallbackQueryHandler(returns_log_next_page, pattern="^next_returns$"),
+                CallbackQueryHandler(returns_log_previous_page, pattern="^pre_returns$")
+            ]
+        },
+        fallbacks=[
+            CommandHandler('returnslog', returns_log),
+        ]
+    )
+    application.add_handler(returns_changes_conversation_handler)
+    
     application.add_handler(CommandHandler('borrow', borrow_book))
     application.add_handler(CommandHandler('return', return_book))
     application.add_handler(CommandHandler('delete', delete_book))
     application.add_handler(CommandHandler('profile', profile))
     application.add_handler(CommandHandler('help', help))
+    
     
     # Interpret any other command or text message as a start of a private chat.
     # This will record the user as being in a private chat with bot.
